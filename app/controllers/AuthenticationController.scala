@@ -14,6 +14,7 @@ import forms.{SignInForm, SignUpForm}
 import models.User
 import models.services.UserService
 import play.api.Configuration
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,7 +57,15 @@ class AuthenticationController @Inject() (
             case Some( user ) =>
               authenticatorService.create(loginInfo).flatMap { authenticator =>
                 authenticatorService.init(authenticator).map { token =>
-                  Results.Ok(token)
+                  // Respond with the users basic information and authentication token
+                  Results Ok
+                    Json.obj (
+                      "id" -> user.userID,
+                      "firstName" -> user.firstName.head,
+                      "lastName" -> user.lastName.head,
+                      "email" -> user.email.head,
+                      "token" -> token
+                    )
                 }
               }
             case None => Future.successful( Results.Unauthorized("User not found") )
