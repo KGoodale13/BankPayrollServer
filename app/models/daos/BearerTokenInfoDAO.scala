@@ -9,6 +9,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import com.mohiva.play.silhouette.api.repositories.AuthenticatorRepository
 import com.mohiva.play.silhouette.impl.authenticators.BearerTokenAuthenticator
 import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,11 +23,13 @@ class BearerTokenInfoDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   import profile.api._
 
   // Logic for converting our datetime types to and from strings
-  protected val dbDateTimeFormat = "YYYY-MM-dd HH:mm:ss"
+  protected val dbDateTimePattern = "YYYY-MM-dd HH:mm:ss"
+
+  protected val dbDateTimeFormat = DateTimeFormat.forPattern( dbDateTimePattern + ".S" )
 
   protected def formatDateTime(dateTime: DateTime): String = dateTime.toString(dbDateTimeFormat)
 
-  protected def parseDateTime(dateTimeString: String): DateTime = DateTime.parse(dateTimeString)
+  protected def parseDateTime(dateTimeString: String): DateTime = dbDateTimeFormat.parseDateTime(dateTimeString)
 
   protected def addAction(authInfo: BearerTokenAuthenticator) =
     loginInfoQuery(authInfo.loginInfo).result.head.flatMap { dbLoginInfo =>
