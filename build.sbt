@@ -1,8 +1,10 @@
 name := "BankPayrollServer"
  
-version := "1.0" 
-      
+version := "1.0"
+
 lazy val `bankpayrollserver` = (project in file(".")).enablePlugins(PlayScala)
+
+routesGenerator := InjectedRoutesGenerator
 
 resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
 
@@ -24,7 +26,8 @@ libraryDependencies ++= Seq(
   "com.mohiva" %% "play-silhouette-password-bcrypt" % "5.0.0",
   "com.mohiva" %% "play-silhouette-crypto-jca" % "5.0.0",
   "com.mohiva" %% "play-silhouette-persistence" % "5.0.0",
-  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % "test"
+  "com.mohiva" %% "play-silhouette-testkit" % "5.0.0" % "test",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.13.0-play26"
 )
 
 
