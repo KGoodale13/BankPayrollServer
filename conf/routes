@@ -7,3 +7,5 @@ POST    /authentication/login       controllers.AuthenticationController.authent
 POST    /authentication/signup      controllers.AuthenticationController.signUp
 
 
+GET     /companies                  controllers.ApplicationController.getUserCompanies()
+GET     /companies/:id/employees    controllers.ApplicationController.getCompanyEmployees( id: String )
