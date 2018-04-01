@@ -18,7 +18,7 @@ case class Employee (
   firstName: String,
   lastName: String,
   payType: String,
-  payRate: Double,
+  payRate: BigDecimal,
 )
 
 case class Company (
@@ -26,7 +26,9 @@ case class Company (
    companyName: String,
    address: String,
    employees: Seq[Employee],
-   authorizedEmails: Seq[String]
+   authorizedEmails: Seq[String],
+   payInterval: String,
+   payPeriodStart: String // The start of the current pay period the company is in the format MM/DD/YYYY, because the company data is updated many times per day this will remain up to date
 )
 
 // Json formats for our mongo documents
@@ -38,8 +40,10 @@ object CompanyJSONFormats {
   implicit val companyWrites: Writes[Company] = (
     (JsPath \ "uID").write[String] and
     (JsPath \ "companyName").write[String] and
-    (JsPath \ "address").write[String]
-  )( company => (company.uID, company.companyName, company.address) )
+    (JsPath \ "address").write[String] and
+    (JsPath \ "payInterval").write[String] and
+    (JsPath \ "payPeriodStart").write[String]
+  )( company => (company.uID, company.companyName, company.address, company.payInterval, company.payPeriodStart) )
 
 }
 
@@ -98,6 +102,19 @@ Can be used at next.json-generator.com
       uID: '{{guid()}}',
       companyName: '{{company()}}',
       address: '{{integer(100, 999)}} {{street()}}, {{city()}}, {{state()}},{{integer(100, 10000)}}',
+      payInterval: '{{random("WEEKLY", "BIWEEKLY", "BIMONTHLY")}}',
+      payPeriodStart: function( tags, parent, index ) {
+        switch( this.payInterval ){
+          case "WEEKLY":
+            return moment().subtract( Math.floor((Math.random() * 6) + 1), "days" ).format("MM/DD/YYYY");
+          case "BIWEEKLY":
+            return moment().subtract( Math.floor((Math.random() * 13) + 1), "days" ).format("MM/DD/YYYY");
+          default:
+            var dayNum = moment().date();
+            var subtractDays = (dayNum > 15) ? dayNum - 15 : dayNum;
+            return moment().subtract( subtractDays, "days" ).format("MM/DD/YYYY");
+        }
+      },
       employees: [
         {
           'repeat(2, 13)':
@@ -106,12 +123,12 @@ Can be used at next.json-generator.com
             firstName: '{{firstName()}}',
             lastName: '{{surname()}}',
             address: '{{integer(100, 999)}} {{street()}}, {{city()}}, {{state()}},{{integer(100, 10000)}}',
-            payType: '{{random("HOURLY", "SALARY_WEEKLY")}}', // Can add others in the future
+            payType: '{{random("HOURLY", "SALARY")}}', // Can add others in the future
             payRate: function( tags, parent, index ) {
               switch( this.payType ) {
                 case "HOURLY":
                   return tags.floating( 10, 75, 2 );
-                case "SALARY_WEEKLY":
+                case "SALARY":
                   return tags.floating( 400, 3000, 2 );
                 default:
                   return tags.floating( 400, 3000, 2 );
