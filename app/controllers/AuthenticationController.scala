@@ -112,6 +112,9 @@ class AuthenticationController @Inject() (
   }
 
 
+  def logout = TODO
+
+
 
 
 }

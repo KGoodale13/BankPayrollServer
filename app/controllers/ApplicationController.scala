@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 
 
 class ApplicationController @Inject() (
-                                        userService: UserService,
+                                        //userService: UserService,
                                         cc: ControllerComponents,
                                         silhouetteProvider: SilhouetteProvider[AuthEnv],
                                         companyDAO: CompanyDAO,

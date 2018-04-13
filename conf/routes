@@ -3,9 +3,13 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+# Authentication routes
 POST    /authentication/login       controllers.AuthenticationController.authenticate()
 POST    /authentication/signup      controllers.AuthenticationController.signUp
+POST    /authentication/logout      controllers.AuthenticationController.logout
 
 
 GET     /companies                  controllers.ApplicationController.getUserCompanies()
 GET     /companies/:id/employees    controllers.ApplicationController.getCompanyEmployees( id: String )
+
+##POST    /companies/:id/
