@@ -55,6 +55,35 @@ class CompanyDAO @Inject() ( implicit ec: ExecutionContext, reactiveMongoApi: Re
   // Quick reference to our companies collection
   val companiesCollection = reactiveMongoApi.database.map(_.collection("companies"))
 
+
+  /**
+    * Checks if the user email is authorized to access the company Id
+    * @param userEmail - Email of the user attempting to access the company
+    * @param companyId - The id of the company to check if the user has access against
+    */
+  def userIsAuthorized( userEmail: String, companyId: String ): Future[Boolean] = {
+    val query = Json.obj( "authorizedEmails" -> userEmail, "uID" -> companyId )
+    companiesCollection.flatMap(
+      _.find(query)
+      .one[Company].map {
+        case Some(company) => true
+        case None => false
+      }
+    )
+  }
+
+  /**
+    * Fetches company data for a specific company if the user is authorized.
+    * This is just a convenient function if you need to get company info and also need to authorize a user.
+    */
+  def getCompanyIfUserIsAuthorized( userEmail: String, companyId: String ): Future[Option[Company]] = {
+    val query = Json.obj( "authorizedEmails" -> userEmail, "uID" -> companyId )
+    companiesCollection.flatMap(
+      _.find(query)
+      .one[Company]
+    )
+  }
+
   /**
     * Returns data for all companies the email is authorized to access
     * @param authorizedEmail - Email of the user to find authorized companies for
@@ -76,7 +105,6 @@ class CompanyDAO @Inject() ( implicit ec: ExecutionContext, reactiveMongoApi: Re
     */
   def getCompanyEmployeesIfAuthorized( authorizedEmail: String, companyId: String ): Future[Option[Seq[Employee]]] = {
     val query = Json.obj( "uID" -> companyId, "authorizedEmails" -> authorizedEmail )
-    val filter = Json.obj( "Employees" -> 1 )
     // Attempt to find a matching company, in the event we do map the return value to only the employee seq of the company
     companiesCollection.flatMap(
       _.find(query)

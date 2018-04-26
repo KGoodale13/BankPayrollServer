@@ -4,12 +4,17 @@
 # ~~~~
 
 # Authentication routes
-POST    /authentication/login       controllers.AuthenticationController.authenticate()
-POST    /authentication/signup      controllers.AuthenticationController.signUp
-POST    /authentication/logout      controllers.AuthenticationController.logout
+POST    /authentication/login           controllers.AuthenticationController.authenticate()
+POST    /authentication/signup          controllers.AuthenticationController.signUp
+POST    /authentication/logout          controllers.AuthenticationController.logout
 
 
-GET     /companies                  controllers.ApplicationController.getUserCompanies()
-GET     /companies/:id/employees    controllers.ApplicationController.getCompanyEmployees( id: String )
+GET     /companies                      controllers.ApplicationController.getUserCompanies()
+GET     /companies/:id/employees        controllers.ApplicationController.getCompanyEmployees( id: String )
+
+GET     /companies/:id/payrollHistory   controllers.ApplicationController.payrollSubmissions(id: String)
+POST    /companies/:id/submitPayroll    controllers.ApplicationController.submitPayroll(id: String)
+
+
 
 ##POST    /companies/:id/
